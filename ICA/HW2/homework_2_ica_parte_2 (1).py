@@ -94,7 +94,12 @@ df_x
 
 X_train, X_test, y_train, y_test = train_test_split(df_x, df_y, test_size=0.3, random_state=42)
 
-"""# Logistic Regression"""
+"""## Item 1
+
+fonte: https://www.datacamp.com/community/tutorials/understanding-logistic-regression-python
+
+# Logistic Regression
+"""
 
 from sklearn.linear_model import LogisticRegression
 
@@ -146,3 +151,218 @@ auc = metrics.roc_auc_score(y_test, predictions_proba)
 plt.plot(fpr,tpr,label="data 1, auc="+str(auc))
 plt.legend(loc=4)
 plt.show()
+
+"""## Item 2
+
+kNN
+https://stackabuse.com/k-nearest-neighbors-algorithm-in-python-and-scikit-learn/
+"""
+
+from sklearn.neighbors import KNeighborsClassifier
+classifier = KNeighborsClassifier(n_neighbors = 20)
+classifier.fit(X_train, y_train)
+
+predictions = classifier.predict(X_test)
+
+cm = metrics.confusion_matrix(y_test, predictions)
+
+class_names=[0,1] # name  of classes
+fig, ax = plt.subplots()
+tick_marks = np.arange(len(class_names))
+plt.xticks(tick_marks, class_names)
+plt.yticks(tick_marks, class_names)
+# create heatmap
+sns.heatmap(pd.DataFrame(cm), annot=True, cmap="YlGnBu" ,fmt='g')
+ax.xaxis.set_label_position("top")
+plt.tight_layout()
+plt.title('Confusion matrix', y=1.1)
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+
+print("Accuracy:",metrics.accuracy_score(y_test, predictions))
+print("Precision:",metrics.precision_score(y_test, predictions))
+print("Recall:",metrics.recall_score(y_test, predictions))
+
+"""com 5: 
+
+Accuracy: 0.8285035961175895
+Precision: 0.8150373735893303
+Recall: 0.8232420429311621
+
+com 6: 
+
+Accuracy: 0.8244535996089658
+Precision: 0.8445166531275385
+Recall: 0.7695040710584752
+
+com 7:
+
+Accuracy: 0.8294113539557294
+Precision: 0.8145608403851765
+Recall: 0.8264988897113249
+
+com 8:
+
+Accuracy: 0.8278751483834927
+Precision: 0.8377952755905512
+Recall: 0.7875647668393783
+
+com 9:
+
+Accuracy: 0.8301794567418477
+Precision: 0.8141258538003198
+Recall: 0.8293116210214656
+
+com 12:
+
+Accuracy: 0.8311570421059982
+Precision: 0.8305136412132297
+Recall: 0.8066617320503331
+
+com 13: 
+
+Accuracy: 0.8318553173661057
+Precision: 0.8131393171012823
+Recall: 0.8355292376017764
+
+com 20: 
+
+Accuracy: 0.8352768661406327
+Precision: 0.8244759374077355
+Recall: 0.8267949666913398
+
+
+"""
+
+predictions_proba = classifier.predict_proba(X_test)[::,1]
+fpr, tpr, _ = metrics.roc_curve(y_test,  predictions_proba)
+auc = metrics.roc_auc_score(y_test, predictions_proba)
+plt.plot(fpr,tpr,label="data 1, auc="+str(auc))
+plt.legend(loc=4)
+plt.show()
+
+"""SVM"""
+
+#Import svm model
+from sklearn import svm
+
+#Create a svm Classifier
+clf = svm.SVC(kernel='linear') # Linear Kernel
+
+#Train the model using the training sets
+clf.fit(X_train, y_train)
+
+#Predict the response for test dataset
+predictions = clf.predict(X_test)
+
+cm = metrics.confusion_matrix(y_test, predictions)
+
+class_names=[0,1] # name  of classes
+fig, ax = plt.subplots()
+tick_marks = np.arange(len(class_names))
+plt.xticks(tick_marks, class_names)
+plt.yticks(tick_marks, class_names)
+# create heatmap
+sns.heatmap(pd.DataFrame(cm), annot=True, cmap="YlGnBu" ,fmt='g')
+ax.xaxis.set_label_position("top")
+plt.tight_layout()
+plt.title('Confusion matrix', y=1.1)
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+
+print("Accuracy:",metrics.accuracy_score(y_test, predictions))
+print("Precision:",metrics.precision_score(y_test, predictions))
+print("Recall:",metrics.recall_score(y_test, predictions))
+
+import numpy as np
+import pylab as pl
+from sklearn import svm
+from sklearn.utils import shuffle
+from sklearn.metrics import roc_curve, auc
+
+roc_auc = auc(fpr, tpr)
+
+pl.clf()
+pl.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
+pl.plot([0, 1], [0, 1], 'k--')
+pl.xlim([0.0, 1.0])
+pl.ylim([0.0, 1.0])
+pl.xlabel('False Positive Rate')
+pl.ylabel('True Positive Rate')
+pl.title('Receiver operating characteristic example')
+pl.legend(loc="lower right")
+pl.show()
+
+# https://go2analytics.wordpress.com/2016/07/26/implement-classification-in-python-and-roc-plotting-svc-example/
+
+"""QDA
+https://www.datasklr.com/select-classification-methods/linear-and-quadratic-discriminant-analysis
+"""
+
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
+#Base QDA Without any tuning
+QDA_model_default = QuadraticDiscriminantAnalysis()
+QDA_model_default.fit(X_train, y_train)
+predictions_QDA_default = QDA_model_default.predict(X_test)
+
+cm = metrics.confusion_matrix(y_test, predictions_QDA_default)
+
+class_names=[0,1] # name  of classes
+fig, ax = plt.subplots()
+tick_marks = np.arange(len(class_names))
+plt.xticks(tick_marks, class_names)
+plt.yticks(tick_marks, class_names)
+# create heatmap
+sns.heatmap(pd.DataFrame(cm), annot=True, cmap="YlGnBu" ,fmt='g')
+ax.xaxis.set_label_position("top")
+plt.tight_layout()
+plt.title('Confusion matrix', y=1.1)
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+
+print("Accuracy:",metrics.accuracy_score(y_test, predictions_QDA_default))
+print("Precision:",metrics.precision_score(y_test, predictions_QDA_default))
+print("Recall:",metrics.recall_score(y_test, predictions_QDA_default))
+
+#Parameter tuning with GridSearchCV 
+#######################
+### QDA
+#######################
+
+estimator_3 = QuadraticDiscriminantAnalysis()
+parameters_3 = {
+    'reg_param': (0.00001, 0.0001, 0.001,0.01, 0.1), 
+    'store_covariance': (True, False),
+    'tol': (0.0001, 0.001,0.01, 0.1), 
+                   }
+# with GridSearch
+grid_search_qda = GridSearchCV(
+    estimator=estimator_3,
+    param_grid=parameters_3,
+    scoring = 'accuracy',
+    n_jobs = -1,
+    cv = 5
+)
+qda_1=grid_search_qda.fit(X_train, y_train)
+predictions_QDA_tuning = qda_1.predict(X_test)
+
+cm = metrics.confusion_matrix(y_test, predictions_QDA_tuning)
+
+class_names=[0,1] # name  of classes
+fig, ax = plt.subplots()
+tick_marks = np.arange(len(class_names))
+plt.xticks(tick_marks, class_names)
+plt.yticks(tick_marks, class_names)
+# create heatmap
+sns.heatmap(pd.DataFrame(cm), annot=True, cmap="YlGnBu" ,fmt='g')
+ax.xaxis.set_label_position("top")
+plt.tight_layout()
+plt.title('Confusion matrix', y=1.1)
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+
+print("Accuracy:",metrics.accuracy_score(y_test, predictions_QDA_tuning))
+print("Precision:",metrics.precision_score(y_test, predictions_QDA_tuning))
+print("Recall:",metrics.recall_score(y_test, predictions_QDA_tuning))
