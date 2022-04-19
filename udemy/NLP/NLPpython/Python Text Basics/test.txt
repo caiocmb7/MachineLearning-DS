@@ -1,0 +1,3 @@
+I'm testing a new code with doing a file creation
+and I'll put new lines to make sense and test it with
+"\n" and another things.
