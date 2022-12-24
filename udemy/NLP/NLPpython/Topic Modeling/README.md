@@ -8,3 +8,5 @@
 
 - Um tipo de agrupamento por tópicos é o LDA (Latent Dirichlet Allocation), que é um modelo estatístico que tenta juntar palavras com o mesmo sentido/ideia
     - Um documento vai ter sua classificação por meio de um tópico e dentro de cada tópico, que será composto por palavras, terá sua classificação e agrupamento
+
+- Dessa forma, o npr.Topic quer dizer que cada row tem um certo topico e o conteudo dessa row em cada um deles se assemelha a certo tópico, que anteriormente foi separado em 7. Dessas, o algoritmo vai dizer para cada row qual é o mais parecido com ele e a partir disso vai dizer qual tópico será. Para certificar isso, basta olhar o tópico e ir no loop para checar quais são as palavras que provavelmente vão se assemelhar com a ideia da row que está sendo analisada
