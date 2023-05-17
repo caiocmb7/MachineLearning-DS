@@ -3,11 +3,13 @@ import requests as rq
 import json
 import pandas as pd
 from pandas import json_normalize
+import logging
 
 
 # Configura o display do pandas
 pd.options.display.max_columns = 99
 pd.options.display.max_rows = 99
+logging.basicConfig(level=logging.INFO)
 
 # Imita um navegador para passar restricoes
 user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36"
@@ -22,7 +24,7 @@ vTransacao = "aluguel"  # Tipo de transacao: venda ou aluguel
 # vUF = "ce"  # Unidade Federativa: rj, sp, mg, etc
 
 # Listas para o script pegar automaticamente, pode aumentar ou diminuir com novos dados
-vImovelLista = ["casas"]  # "casas","casas-de-vila","casas-de-condominio"
+vImovelLista = ["apartamentos", "cobertura"]  # "casas","casas-de-vila","casas-de-condominio"
 # vCidadeLista = [
 #     "rio-de-janeiro"
 # ]  # Coloca o estado no formato "rio-de-janeiro","sao-paulo", ou "TODOS" sendo que tem q ajustar a vUF para pegar o estado
@@ -33,10 +35,10 @@ vBairroLista = [
     "TODOS"
 ]  # "barra-da-tijuca","pechincha","freguesia-jacarepagua","anil" ou "TODOS" para pesquisar todos de determinada area
 vQuartos = 3  # Quantidade de quartos
-vValorMin = 0  # Valor Minimo
-vValorMax = 1000000  # Valor Maximo
+vValorMin = 100  # Valor Minimo
+vValorMax = 2000000  # Valor Maximo
 
-vUFs = ["es"]
+vUFs = ["rj"]
 for vUF in vUFs:
     for vZona in vZonaLista:
         # Para cada bairro na lista de Bairros
@@ -120,10 +122,6 @@ for vUF in vUFs:
                         + str(vValorMax)
                     )
 
-                    # print('Pagina: ' + str(vPagina))
-                    #print(vURL)
-                    # Testa o codigo de retorno do site
-                    #print(vURL+'\n')
                     vResp = rq.get(vURL, headers=headers)
                     vStat = vResp.status_code
 
@@ -144,11 +142,6 @@ for vUF in vUFs:
                             vHTML = vHTML.split('"results":{"listings":[', 1)[1]
                             vHTML = vHTML.split('],"nearbyListings":[]', 1)[0]
                             vHTML = vHTML.split(',"type":"nearby"}]', 1)[0]
-                            # vHTML = vHTML.replace(',"superPremiumListings":[','')
-                            # vHTML = vHTML.split(',"images":',1)[0]
-
-                            # Ao dar erro de delimitador, adicionar ou retirar chaves antes do colchetes na variavel abaixo
-                            # Valida o fim da string, pois para alguns casos vem com char a menos
                             if vHTML[-2:] == "}}":
                                 v1 = '{"listings":[' + vHTML + "]}"
                             elif vHTML[-10:] == '"premium"}':
@@ -157,25 +150,11 @@ for vUF in vUFs:
                                 v1 = '{"listings":[' + vHTML + "}]}"
                             else:
                                 v1 = '{"listings":[' + vHTML + "}]}"
-                            # v1 = v1.replace(r'\u002',' ')
-
-                            # x = 'id-2489012479\u002F"},"type":"premium"}],"superPremiumListings":['
-                            # y = '"superPremiumListings":['
-                            # print(x.split(y,1)[0])
-
-                            # print(vHTML)[-1:])
-                            # print(v1)
-                            # Retira a marcacao de moeda, deixando apenas o valor
                             v1 = v1.replace("R$ ", "")
                             v1 = v1.replace(',"superPremiumListings":[}]}', "}")
                             v1 = v1.split(";(function", 1)[0]
                             v1 = v1.split(',"advertisers"', 1)[0]
-
-                            # print(v1)
-                            # transforma para json
                             j = json.loads(v1)
-
-                            # print(j)
 
                             # Cria o dataframe do pandas, já normalizando o json
                             df = json_normalize(j["listings"])
@@ -248,10 +227,6 @@ for vUF in vUFs:
                             valid_columns = [col for col in columns if col in df.columns]
                             # Deixa somente as colunas utilizaveis
                             df = df[valid_columns]
-
-                            # print(df['listing.address.point.source'])
-                            # Insere uma coluna referente a pagina lida
-                            # df["Page"] = vPagina
 
                             # Insere a coluna com o tipo de imovel
                             df["imvl_type"] = vImovel
