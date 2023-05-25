@@ -24,7 +24,7 @@ vTransacao = "aluguel"  # Tipo de transacao: venda ou aluguel
 # vUF = "ce"  # Unidade Federativa: rj, sp, mg, etc
 
 # Listas para o script pegar automaticamente, pode aumentar ou diminuir com novos dados
-vImovelLista = ["apartamentos", "cobertura"]  # "casas","casas-de-vila","casas-de-condominio"
+vImovelLista = ["casas"]  # "casas","casas-de-vila","casas-de-condominio"
 # vCidadeLista = [
 #     "rio-de-janeiro"
 # ]  # Coloca o estado no formato "rio-de-janeiro","sao-paulo", ou "TODOS" sendo que tem q ajustar a vUF para pegar o estado
@@ -34,7 +34,7 @@ vZonaLista = [
 vBairroLista = [
     "TODOS"
 ]  # "barra-da-tijuca","pechincha","freguesia-jacarepagua","anil" ou "TODOS" para pesquisar todos de determinada area
-vQuartos = 3  # Quantidade de quartos
+vQuartos = 4  # Quantidade de quartos
 vValorMin = 100  # Valor Minimo
 vValorMax = 2000000  # Valor Maximo
 
