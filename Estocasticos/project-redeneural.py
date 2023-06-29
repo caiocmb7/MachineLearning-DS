@@ -9,7 +9,8 @@ Original file is located at
 
 import numpy as np
 from sklearn import svm
-
+import matplotlib.pyplot as plt
+from scipy import signal
 from google.colab import drive
 drive.mount('/content/drive')
 
@@ -17,9 +18,28 @@ data_path = "/content/drive/My Drive/estocastico/"
 
 """## Analise dos Dados"""
 
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy import signal
+def plot_eeg_data(file_path):
+    data = np.loadtxt(file_path)
+    num_channels, num_samples = data.shape
+    sampling_rate = 256
+    sample_duration = 1 / sampling_rate
+
+    # Criar um array de tempo com base na duração de cada amostra
+    time = np.arange(0, num_samples) * sample_duration
+
+    fig, ax = plt.subplots(nrows=num_channels, sharex=True, figsize=(16, 25))
+
+    # Iterar pelos canais
+    for channel in range(num_channels):
+        channel_data = data[channel]
+        ax[channel].plot(time, channel_data)
+        ax[channel].set_ylabel(f"Canal {channel+1}", rotation=30, ha="right")
+        fig.subplots_adjust(hspace=0.5)
+
+    ax[-1].set_xlabel("Tempo (s)")
+    ax[0].set_title(f"Exame de Eletroencefalografia para {file_path}")
+    plt.savefig(f"eletroencefalografia_{file_path}.png")
+    plt.show()
 
 # Carregar os dados de treinamento normais
 n1 = np.loadtxt(data_path + "n1.dat")
