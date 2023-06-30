@@ -147,7 +147,8 @@ plt.show()
 import numpy as np
 from sklearn import svm
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.preprocessing import StandardScaler
 
 # Carregar os dados de treinamento normais
 n1 = np.loadtxt(data_path + "n1.dat")
@@ -160,6 +161,11 @@ s1 = np.loadtxt(data_path + "s1.dat")
 s2 = np.loadtxt(data_path + "s2.dat")
 s4 = np.loadtxt(data_path + "s4.dat")
 s5 = np.loadtxt(data_path + "s5.dat")
+
+# Carregar os dados desconhecidos
+d1 = np.loadtxt(data_path + "d1.dat")
+d2 = np.loadtxt(data_path + "d2.dat")
+d3 = np.loadtxt(data_path + "d3.dat")
 
 n3 = np.loadtxt(data_path + "n3.dat")
 n3 = n3[:, 1025:6145]
@@ -175,7 +181,9 @@ X_train = np.concatenate((n1, n2, n3, n4, n5, s1, s2, s3, s4, s5))
 y_train = np.concatenate((y_normal, y_epileptic))
 
 # Dividir os dados em conjunto de treinamento e teste
-X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X_train, y_train, test_size=0.2, random_state=42
+)
 
 # Normalizar os dados de treino
 scaler = StandardScaler()
@@ -185,10 +193,22 @@ X_test = scaler.transform(X_test)
 # Criar o classificador SVM
 clf = svm.SVC()
 
-# Treinar o classificador SVM
-clf.fit(X_train, y_train)
+# Definir os hiperparâmetros a serem ajustados
+param_grid = {"C": [0.1, 1, 10], "kernel": ["linear", "rbf", "poly"]}
 
-# Carregar os dados desconhecidos
+# Criar o objeto GridSearchCV
+grid_search = GridSearchCV(clf, param_grid, cv=10)
+
+# Treinar o classificador SVM com busca em grade
+grid_search.fit(X_train, y_train)
+
+# Obter os melhores parâmetros encontrados
+best_params = grid_search.best_params_
+
+# Obter o melhor modelo encontrado
+best_model = grid_search.best_estimator_
+
+# Realizar a classificação dos dados desconhecidos
 d1 = np.loadtxt("d1.dat")
 d2 = np.loadtxt("d2.dat")
 d3 = np.loadtxt("d3.dat")
@@ -198,30 +218,10 @@ d1 = scaler.transform(d1)
 d2 = scaler.transform(d2)
 d3 = scaler.transform(d3)
 
-# Realizar a classificação dos dados desconhecidos
-pred1 = clf.predict(d1)
-pred2 = clf.predict(d2)
-pred3 = clf.predict(d3)
-
-# Imprimir as previsões
-list_pred1_svm = []
-for value in pred1:
-    if value == 0:
-        list_pred1_svm.append("normal")
-    else:
-        list_pred1_svm.append("epileptico")
-list_pred2_svm = []
-for value in pred2:
-    if value == 0:
-        list_pred2_svm.append("normal")
-    else:
-        list_pred2_svm.append("epileptico")
-list_pred3_svm = []
-for value in pred3:
-    if value == 0:
-        list_pred3_svm.append("normal")
-    else:
-        list_pred3_svm.append("epileptico")
+# Realizar a classificação dos dados desconhecidos usando o melhor modelo
+pred1 = best_model.predict(d1)
+pred2 = best_model.predict(d2)
+pred3 = best_model.predict(d3)
 
 # Converter as previsões em valores numéricos (0 para normal e 1 para epiléptico)
 list_pred1_svm = pred1.tolist()
@@ -229,18 +229,20 @@ list_pred2_svm = pred2.tolist()
 list_pred3_svm = pred3.tolist()
 
 # Criar DataFrame para comparar as previsões
-df = pd.DataFrame({
-    'Prediction_D1': list_pred1_svm,
-    'Prediction_D2': list_pred2_svm,
-    'Prediction_D3': list_pred3_svm
-})
+df = pd.DataFrame(
+    {
+        "Prediction_D1": list_pred1_svm,
+        "Prediction_D2": list_pred2_svm,
+        "Prediction_D3": list_pred3_svm,
+    }
+)
 
 # Mapear os valores numéricos de volta para as strings 'normal' e 'epiléptico'
-df.replace({0: 'normal', 1: 'epiléptico'}, inplace=True)
+df.replace({0: "normal", 1: "epiléptico"}, inplace=True)
 
 # Avaliar o desempenho do modelo nos dados de teste
-accuracy = clf.score(X_test, y_test)
-print("Acurácia no conjunto de teste:", accuracy)
+accuracy = best_model.score(X_test, y_test)
+print("Acurácia:", accuracy)
 
 # Exibir DataFrame
 df
